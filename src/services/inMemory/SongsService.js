@@ -7,8 +7,9 @@ class SongsService {
       this._songs = [];
     }
 
-    addSong ({title,year,genre,performer,duration,albumId}){
+    addSong ({title,year,genre,performer,duration}){
         const id = `song-${nanoid(16)}`;
+        const albumId = `album-${nanoid(16)}`;
         const newSong = {
             id,title,year,genre,performer,duration,albumId
         };

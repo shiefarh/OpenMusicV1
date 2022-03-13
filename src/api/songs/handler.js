@@ -1,5 +1,7 @@
+//impor module
 const ClientError = require("../../exceptions/ClientError");
 
+//membuat handler untuk lagu dengan melakukan validasi pada input yang diberikan serta melakukan error handling
 class SongsHandler {
     constructor(service, validator) {
       this._service = service;
@@ -12,12 +14,12 @@ class SongsHandler {
     this.deleteSongByIdHandler = this.deleteSongByIdHandler.bind(this);
     }
 
-    postSongHandler(request, h) {
+    //handler untuk menambahkan lagu
+    async postSongHandler(request, h) {
         try{
             this._validator.validateSongPayload(request.payload);
             const { title, year, genre, performer, duration, albumId } = request.payload;
-            const songId = this._service.addSong({ title, year, genre, performer, duration, albumId });
-
+            const songId = await this._service.addSong({ title, year, genre, performer, duration, albumId });
             const response = h.response({
                 status: 'success',
                 message: 'Lagu berhasil ditambahkan',
@@ -36,8 +38,6 @@ class SongsHandler {
           response.code(error.statusCode);
           return response;
         }
-   
-        // Server ERROR!
         const response = h.response({
           status: 'error',
           message: 'Maaf, terjadi kegagalan pada server kami.',
@@ -48,8 +48,9 @@ class SongsHandler {
         }
     }
 
-    getSongsHandler() {
-        const songs = this._service.getSongs();
+    //handler untuk mendapatkan seluruh lagu
+    async getSongsHandler() {
+        const songs = await this._service.getSongs();
         return {
           status: 'success',
           data: {
@@ -62,10 +63,11 @@ class SongsHandler {
         };
     }
 
-    getSongByIdHandler(request, h) {
+    //handler untuk mendapatkan lagu sesuai id
+    async getSongByIdHandler(request, h) {
         try {
             const { id } = request.params;
-            const song = this._service.getSongById(id);
+            const song = await this._service.getSongById(id);
             return {
                 status: 'success',
                 data: {
@@ -81,8 +83,6 @@ class SongsHandler {
             response.code(error.statusCode);
             return response;
           }
-     
-          // Server ERROR!
           const response = h.response({
             status: 'error',
             message: 'Maaf, terjadi kegagalan pada server kami.',
@@ -93,11 +93,12 @@ class SongsHandler {
         }
     }
 
-    putSongByIdHandler(request, h) {
+    //handler untuk mengedit lagu sesuai id
+    async putSongByIdHandler(request, h) {
         try {
           this._validator.validateSongPayload(request.payload);
           const { id } = request.params;
-          this._service.editSongById(id, request.payload);
+          await this._service.editSongById(id, request.payload);
           return {
               status: 'success',
               message: 'Lagu berhasil diperbarui',
@@ -111,8 +112,6 @@ class SongsHandler {
             response.code(error.statusCode);
             return response;
           }
-     
-          // Server ERROR!
           const response = h.response({
             status: 'error',
             message: 'Maaf, terjadi kegagalan pada server kami.',
@@ -123,10 +122,11 @@ class SongsHandler {
         }
     }
 
-    deleteSongByIdHandler(request, h) {
+    //handler untuk menghapus lagu sesuai id
+    async deleteSongByIdHandler(request, h) {
         try {
             const { id } = request.params;
-            this._service.deleteSongById(id);
+            await this._service.deleteSongById(id);
           return {
             status: 'success',
             message: 'Lagu berhasil dihapus',
@@ -140,8 +140,6 @@ class SongsHandler {
             response.code(error.statusCode);
             return response;
           }
-     
-          // Server ERROR!
           const response = h.response({
             status: 'error',
             message: 'Maaf, terjadi kegagalan pada server kami.',
@@ -153,4 +151,5 @@ class SongsHandler {
       }
 }
 
+//ekspor modul handler
 module.exports = SongsHandler;
